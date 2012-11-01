@@ -40,7 +40,7 @@ Marionette.CollectionView = Marionette.View.extend({
       index = 0;
     }
 
-    return this.addItemView(item, ItemView, index, this.$el);
+    return this.addItemView(item, ItemView, index, this.getItemViewContainer());
   },
 
   // Override from `Marionette.View` to guarantee the `onShow` method
@@ -217,7 +217,7 @@ Marionette.CollectionView = Marionette.View.extend({
     }
 
     if (!this.collection || this.collection.length === 0){
-      this.showEmptyView(this.$el);
+      this.showEmptyView(this.getItemViewContainer());
     }
 
     this.triggerMethod("item:removed", view);
