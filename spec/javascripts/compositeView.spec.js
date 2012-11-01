@@ -437,10 +437,7 @@ describe("composite view", function(){
       tagName: "table",
       template: "#grid-template",
       itemView: GridRow,
-
-      appendHtml: function(cv, iv){
-        cv.$("tbody").append(iv.el);
-      }
+      itemViewContainer: "tbody"
     });
 
     beforeEach(function(){
@@ -498,10 +495,7 @@ describe("composite view", function(){
       tagName: "table",
       template: "#grid-template",
       itemView: GridRow,
-
-      appendHtml: function(cv, iv){
-        cv.$("tbody").append(iv.el);
-      }
+      itemViewContainer: "tbody"
     });
 
     var GridViewWithUIBindings = GridView.extend({

@@ -95,14 +95,15 @@ Marionette.CompositeView = Marionette.CollectionView.extend({
   // `itemViewContainer` (a jQuery selector). Override this method to
   // provide custom logic of how the child item view instances have their
   // HTML appended to the composite view instance.
-  appendHtml: function(cv, iv){
-    var $container = this.getItemViewContainer(cv);
-    $container.append(iv.el);
+  appendHtml: function(frag, iv, index){
+    frag.append(iv.el);
   },
 
   // Internal method to ensure an `$itemViewContainer` exists, for the
   // `appendHtml` method to use.
-  getItemViewContainer: function(containerView){
+  getItemViewContainer: function(){
+    var containerView = this;
+
     if ("$itemViewContainer" in containerView){
       return containerView.$itemViewContainer;
     }

@@ -62,7 +62,7 @@ describe("collection view", function(){
     });
 
     it("should append the html for each itemView", function(){
-      expect($(collectionView.$el)).toHaveHtml("<span>bar</span><span>baz</span>");
+      expect(collectionView.$el).toHaveHtml("<span>bar</span><span>baz</span>");
     });
 
     it("should provide the index for each itemView, when appending", function(){
@@ -304,7 +304,7 @@ describe("collection view", function(){
 
       render: function(){
         var ItemView = this.getItemView();
-        this.addItemView(model, ItemView, 0);
+        this.addItemView(model, ItemView, 0, this.$el);
       }
     });
 
@@ -472,8 +472,8 @@ describe("collection view", function(){
     var PrependHtmlView = Backbone.Marionette.CollectionView.extend({
       itemView: ItemView,
 
-      appendHtml: function(collectionView, itemView){
-        collectionView.$el.prepend(itemView.el);
+      appendHtml: function(frag, itemView){
+        frag.prepend(itemView.el);
       }
     });
 

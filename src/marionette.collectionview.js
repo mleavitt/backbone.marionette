@@ -6,7 +6,9 @@
 Marionette.CollectionView = Marionette.View.extend({
   constructor: function(options){
     this.initChildViewStorage();
+
     Marionette.View.prototype.constructor.apply(this, arguments);
+
     this.initialEvents();
     this.onShowCallbacks = new Marionette.Callbacks();
 
@@ -38,7 +40,7 @@ Marionette.CollectionView = Marionette.View.extend({
       index = 0;
     }
 
-    return this.addItemView(item, ItemView, index);
+    return this.addItemView(item, ItemView, index, this.$el);
   },
 
   // Override from `Marionette.View` to guarantee the `onShow` method
@@ -71,37 +73,47 @@ Marionette.CollectionView = Marionette.View.extend({
     this.closeEmptyView();
     this.closeChildren();
 
+    var frag = $(document.createDocumentFragment());
+
     if (this.collection && this.collection.length > 0) {
-      this.showCollection();
+      this.showCollection(frag);
     } else {
-      this.showEmptyView();
+      this.showEmptyView(frag);
     }
+
+    var container = this.getItemViewContainer();
+    container.empty().append(frag);
 
     this.triggerRendered();
     return this;
   },
 
+  getItemViewContainer: function(){
+    return this.$el;
+  },
+
   // Internal method to loop through each item in the
   // collection view and show it
-  showCollection: function(){
-    var that = this;
+  showCollection: function(frag){
     var ItemView;
+    var that = this;
+    
     this.collection.each(function(item, index){
       ItemView = that.getItemView(item);
-      that.addItemView(item, ItemView, index);
+      that.addItemView(item, ItemView, index, frag);
     });
   },
 
   // Internal method to show an empty view in place of
   // a collection of item views, when the collection is
   // empty
-  showEmptyView: function(){
+  showEmptyView: function(frag){
     var EmptyView = Marionette.getOption(this, "emptyView");
 
     if (EmptyView && !this._showingEmptyView){
       this._showingEmptyView = true;
       var model = new Backbone.Model();
-      this.addItemView(model, EmptyView, 0);
+      this.addItemView(model, EmptyView, 0, frag);
     }
   },
 
@@ -132,7 +144,7 @@ Marionette.CollectionView = Marionette.View.extend({
 
   // Render the child item's view and add it to the
   // HTML for the collection view.
-  addItemView: function(item, ItemView, index){
+  addItemView: function(item, ItemView, index, frag){
     var that = this;
 
     // get the itemViewOptions if any were specified
@@ -167,7 +179,7 @@ Marionette.CollectionView = Marionette.View.extend({
     this.childBindings[view.cid] = childBinding;
 
     // Render it and show it
-    var renderResult = this.renderItemView(view, index);
+    var renderResult = this.renderItemView(frag, view, index);
 
     // call onShow for child item views
     if (view.onShow){
@@ -178,9 +190,9 @@ Marionette.CollectionView = Marionette.View.extend({
   },
 
   // render the item view
-  renderItemView: function(view, index) {
+  renderItemView: function(frag, view, index) {
     view.render();
-    this.appendHtml(this, view, index);
+    this.appendHtml(frag, view, index);
   },
 
   // Build an `itemView` for every model in the collection.
@@ -193,6 +205,7 @@ Marionette.CollectionView = Marionette.View.extend({
   // Remove the child view and close it
   removeItemView: function(item){
     var view = this.children[item.cid];
+
     if (view){
       var childBinding = this.childBindings[view.cid];
       if (childBinding) {
@@ -204,7 +217,7 @@ Marionette.CollectionView = Marionette.View.extend({
     }
 
     if (!this.collection || this.collection.length === 0){
-      this.showEmptyView();
+      this.showEmptyView(this.$el);
     }
 
     this.triggerMethod("item:removed", view);
@@ -213,8 +226,8 @@ Marionette.CollectionView = Marionette.View.extend({
   // Append the HTML to the collection's `el`.
   // Override this method to do something other
   // then `.append`.
-  appendHtml: function(collectionView, itemView, index){
-    collectionView.$el.append(itemView.el);
+  appendHtml: function(frag, itemView, index){
+    frag.append(itemView.el);
   },
 
   // Store references to all of the child `itemView`
