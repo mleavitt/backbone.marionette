@@ -59,7 +59,7 @@ Marionette.CompositeView = Marionette.CollectionView.extend({
     this.resetItemViewContainer();
 
     var html = this.renderModel();
-    this.$el.html(html);
+    this.$el.empty().append(html);
 
     // the ui bindings is done here and not at the end of render since they 
     // will not be available until after the model is rendered, but should be
