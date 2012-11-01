@@ -82,7 +82,7 @@ Marionette.CollectionView = Marionette.View.extend({
     }
 
     var container = this.getItemViewContainer();
-    container.empty().append(frag);
+    container.append(frag);
 
     this.triggerRendered();
     return this;
