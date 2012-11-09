@@ -63,11 +63,13 @@ Marionette.Component = (function(Backbone, Marionette, $, _){
       // augment the component w/ the controller methods
       var controller = this._controller;
       if (controller){
-        _.each(_.functions(controller), function(name){
-          if (name[0] !== "_"){
-            this[name] = _.bind(controller[name], controller);
+        for(var name in controller){
+          if (_.isFunction(controller[name])){
+            if (name[0] !== "_"){
+              this[name] = _.bind(controller[name], controller);
+            }
           }
-        });
+        }
       }
 
     },
