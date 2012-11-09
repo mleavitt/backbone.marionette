@@ -8,8 +8,8 @@ describe("component", function(){
       initializer = jasmine.createSpy("initializer");
       options = {};
 
-      MyComponent = Marionette.Component(function(comp){
-        comp.addInitializer(initializer);
+      MyComponent = Marionette.Component(function(intializers){
+        intializers.addInitializer(initializer);
       });
 
       var myComp = new MyComponent();
@@ -32,8 +32,8 @@ describe("component", function(){
       initializer = jasmine.createSpy("initializer");
       options = {foo: "bar"};
 
-      MyComponent = Marionette.Component(function(comp){
-        comp.addInitializer(initializer);
+      MyComponent = Marionette.Component(function(intializers){
+        intializers.addInitializer(initializer);
       });
 
       var myComp = new MyComponent(options);
@@ -52,8 +52,8 @@ describe("component", function(){
     beforeEach(function(){
       initializer = jasmine.createSpy("initializer");
 
-      MyComponent = Marionette.Component(function(comp){
-        comp.addInitializer(initializer);
+      MyComponent = Marionette.Component(function(intializers){
+        intializers.addInitializer(initializer);
       });
 
       var myComp = new MyComponent({foo: "bar", x: "1"});
@@ -79,8 +79,8 @@ describe("component", function(){
     beforeEach(function(){
       initializer = jasmine.createSpy("initializer");
 
-      MyComponent = Marionette.Component(function(comp){
-        comp.addInitializer(initializer);
+      MyComponent = Marionette.Component(function(intializers){
+        intializers.addInitializer(initializer);
       });
 
       var myComp = new MyComponent();
@@ -100,8 +100,8 @@ describe("component", function(){
     beforeEach(function(){
       finalizer = jasmine.createSpy("finalizer");
 
-      MyComponent = Marionette.Component(function(comp){
-        comp.addFinalizer(finalizer);
+      MyComponent = Marionette.Component(function(intializers){
+        intializers.addFinalizer(finalizer);
       });
 
       var myComp = new MyComponent();
@@ -122,8 +122,8 @@ describe("component", function(){
     beforeEach(function(){
       finalizer = jasmine.createSpy("finalizer");
 
-      MyComponent = Marionette.Component(function(comp){
-        comp.addFinalizer(finalizer);
+      MyComponent = Marionette.Component(function(intializers){
+        intializers.addFinalizer(finalizer);
       });
 
       var myComp = new MyComponent();
@@ -143,8 +143,8 @@ describe("component", function(){
     beforeEach(function(){
       finalizer = jasmine.createSpy("finalizer");
 
-      MyComponent = Marionette.Component(function(comp){
-        comp.addFinalizer(finalizer);
+      MyComponent = Marionette.Component(function(intializers){
+        intializers.addFinalizer(finalizer);
       });
 
       var myComp = new MyComponent();
@@ -167,9 +167,9 @@ describe("component", function(){
       initializer = jasmine.createSpy("finalizer");
       finalizer = jasmine.createSpy("initializer");
 
-      MyComponent = Marionette.Component(function(comp){
-        comp.addInitializer(initializer);
-        comp.addFinalizer(finalizer);
+      MyComponent = Marionette.Component(function(intializers){
+        intializers.addInitializer(initializer);
+        intializers.addFinalizer(finalizer);
       });
 
       var myComp = new MyComponent();
@@ -196,9 +196,9 @@ describe("component", function(){
       initializer = jasmine.createSpy("initializer");
       finalizer = jasmine.createSpy("finalizer");
 
-      MyComponent = Marionette.Component(function(comp){
-        comp.addInitializer(initializer);
-        comp.addFinalizer(finalizer);
+      MyComponent = Marionette.Component(function(intializers){
+        intializers.addInitializer(initializer);
+        intializers.addFinalizer(finalizer);
       });
 
       c1 = new MyComponent();
@@ -222,6 +222,50 @@ describe("component", function(){
     it("should create separate object instances", function(){
       expect(c1 === c2).toBe(false);
     });
+  });
+
+  describe("when supplying a controller instance to the component", function(){
+    var component, controller, pub, _priv;
+
+    beforeEach(function(){
+      pub = jasmine.createSpy("public function");
+      _priv = jasmine.createSpy("private function");
+
+      // define a component
+      var MyComponent = Marionette.Component(function(intializers, backbone, marionette, $, _){
+
+        // build a controller
+        var Controller = Marionette.Controller.extend({
+          pub: pub,
+          _priv: _priv
+        });
+
+        intializers.addInitializer(function(options){
+          controller = new Controller();
+          this.setController(controller);
+        });
+      });
+
+      // get the component instance
+      component = new MyComponent();
+      component.start();
+
+      // run the controller method from the component
+      component.pub();
+    });
+
+    it("should attach all 'public' controller methods to the component", function(){
+      expect(_.isFunction(component.pub)).toBe(true);
+    });
+    
+    it("should not attach any 'private' controller methods (methods that start with '_') to the component instance", function(){
+      expect(component._priv).toBeUndefined();
+    });
+
+    it("should execute controller methods in the context of the controller", function(){
+      expect(pub.mostRecentCall.object).toBe(controller);
+    });
+
   });
 
 });
