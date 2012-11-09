@@ -1,47 +1,6 @@
 describe("component", function(){
 
-  describe("when defining a component with a function", function(){
-    var MyComponent, IN, BB, MM, JQ, UN;
-
-    beforeEach(function(){
-
-      MyComponent = Marionette.Component(function(Initers, Backbone, Marionette, $, _){
-        IN = Initers;
-        BB = Backbone;
-        MM = Marionette;
-        JQ = $;
-        UN = _;
-      });
-
-    });
-
-    it("should return a constructor function to create a new component instance", function(){
-      expect(_.isFunction(MyComponent)).toBe(true);
-    });
-
-    it("should pass the initializers through the constructor", function(){
-      expect(IN).not.toBeUndefined();
-    });
-
-    it("should pass backbone through the constructor", function(){
-      expect(BB).toBe(Backbone);
-    });
-
-    it("should pass Marionette through the constructor", function(){
-      expect(MM).toBe(Marionette);
-    });
-
-    it("should pass $ through the constructor", function(){
-      expect(JQ).toBe($);
-    });
-
-    it("should pass _ through the constructor", function(){
-      expect(UN).toBe(_);
-    });
-
-  });
-
-  describe("when starting a new component instance", function(){
+  describe("when starting a component instance", function(){
 
     var MyComponent, initializer;
 
@@ -58,6 +17,158 @@ describe("component", function(){
 
     it("should run initializers", function(){
       expect(initializer).toHaveBeenCalled();
+    });
+  });
+
+  describe("when starting a component that is already started", function(){
+
+    var MyComponent, initializer;
+
+    beforeEach(function(){
+      initializer = jasmine.createSpy("initializer");
+
+      MyComponent = Marionette.Component(function(comp){
+        comp.addInitializer(initializer);
+      });
+
+      var myComp = new MyComponent();
+      myComp.start();
+      myComp.start();
+    });
+
+    it("should run initializers once", function(){
+      expect(initializer.callCount).toBe(1);
+    });
+  });
+
+  describe("when stopping a component instance", function(){
+
+    var MyComponent, finalizer;
+
+    beforeEach(function(){
+      finalizer = jasmine.createSpy("finalizer");
+
+      MyComponent = Marionette.Component(function(comp){
+        comp.addFinalizer(finalizer);
+      });
+
+      var myComp = new MyComponent();
+      myComp.start();
+
+      myComp.stop();
+    });
+
+    it("should run finalizers", function(){
+      expect(finalizer).toHaveBeenCalled();
+    });
+  });
+
+  describe("when stopping a component that is not started", function(){
+
+    var MyComponent, finalizer;
+
+    beforeEach(function(){
+      finalizer = jasmine.createSpy("finalizer");
+
+      MyComponent = Marionette.Component(function(comp){
+        comp.addFinalizer(finalizer);
+      });
+
+      var myComp = new MyComponent();
+
+      myComp.stop();
+    });
+
+    it("should not run finalizers", function(){
+      expect(finalizer).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("when stopping a component that is already stopped", function(){
+
+    var MyComponent, finalizer;
+
+    beforeEach(function(){
+      finalizer = jasmine.createSpy("finalizer");
+
+      MyComponent = Marionette.Component(function(comp){
+        comp.addFinalizer(finalizer);
+      });
+
+      var myComp = new MyComponent();
+      myComp.start();
+
+      myComp.stop();
+      myComp.stop();
+    });
+
+    it("should run the finalizers once", function(){
+      expect(finalizer.callCount).toBe(1);
+    });
+  });
+
+  describe("when stopping and restarting and stopping a component", function(){
+
+    var MyComponent, initializer, finalizer;
+
+    beforeEach(function(){
+      initializer = jasmine.createSpy("finalizer");
+      finalizer = jasmine.createSpy("initializer");
+
+      MyComponent = Marionette.Component(function(comp){
+        comp.addInitializer(initializer);
+        comp.addFinalizer(finalizer);
+      });
+
+      var myComp = new MyComponent();
+      myComp.start();
+      myComp.stop();
+      myComp.start();
+      myComp.stop();
+    });
+
+    it("should run the finalizers twice", function(){
+      expect(finalizer.callCount).toBe(2);
+    });
+
+    it("should run the initializers twice", function(){
+      expect(initializer.callCount).toBe(2);
+    });
+  });
+
+  describe("when starting and stopping two instances of the same component", function(){
+
+    var MyComponent, c1, c2, initializer, finalizer;
+
+    beforeEach(function(){
+      initializer = jasmine.createSpy("initializer");
+      finalizer = jasmine.createSpy("finalizer");
+
+      MyComponent = Marionette.Component(function(comp){
+        comp.addInitializer(initializer);
+        comp.addFinalizer(finalizer);
+      });
+
+      c1 = new MyComponent();
+      c2 = new MyComponent();
+
+      c1.start();
+      c2.start();
+
+      c1.stop();
+      c2.stop();
+    });
+
+    it("should run initializers twice", function(){
+      expect(initializer.callCount).toBe(2);
+    });
+
+    it("should run finalizers", function(){
+      expect(finalizer.callCount).toBe(2);
+    });
+
+    it("should create separate object instances", function(){
+      expect(c1 === c2).toBe(false);
     });
   });
 
