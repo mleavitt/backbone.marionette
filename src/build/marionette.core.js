@@ -12,6 +12,7 @@ Backbone.Marionette = Marionette = (function(Backbone, _, $){
 //= ../marionette.renderer.js
 
 //= ../marionette.controller.js
+//= ../marionette.component.js
 //= ../marionette.region.js
 
 //= ../marionette.view.js
