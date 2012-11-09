@@ -21,8 +21,8 @@ Marionette.Component = (function(Backbone, Marionette, $, _){
       this._finalizerCallbacks.add(cb);
     },
 
-    runInitializers: function(context){
-      this._initializerCallbacks.run(null, context);
+    runInitializers: function(options, context){
+      this._initializerCallbacks.run(options, context);
     },
 
     runFinalizers: function(context){
@@ -46,11 +46,11 @@ Marionette.Component = (function(Backbone, Marionette, $, _){
   };
 
   _.extend(Component.prototype, {
-    start: function(){
+    start: function(options){
       if (this._started){ return; }
 
       this._started = true;
-      this.initializers.runInitializers(this);
+      this.initializers.runInitializers(options, this);
       this.initializers.resetInitializers();
     },
 
@@ -71,7 +71,7 @@ Marionette.Component = (function(Backbone, Marionette, $, _){
     definition(initializers, Backbone, Marionette, $, _);
 
     return function(options){
-      return new Component(initializers);
+      return new Component(initializers, options);
     };
   };
 

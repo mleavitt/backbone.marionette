@@ -2,21 +2,26 @@ describe("component", function(){
 
   describe("when starting a component instance", function(){
 
-    var MyComponent, initializer;
+    var MyComponent, initializer, options;
 
     beforeEach(function(){
       initializer = jasmine.createSpy("initializer");
+      options = {};
 
       MyComponent = Marionette.Component(function(comp){
         comp.addInitializer(initializer);
       });
 
       var myComp = new MyComponent();
-      myComp.start();
+      myComp.start(options);
     });
 
     it("should run initializers", function(){
       expect(initializer).toHaveBeenCalled();
+    });
+
+    it("should pass options through initializers", function(){
+      expect(initializer).toHaveBeenCalledWith(options);
     });
   });
 
