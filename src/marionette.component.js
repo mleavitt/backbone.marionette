@@ -72,7 +72,7 @@ Marionette.Component = (function(Backbone, Marionette, $, _){
 
     return function(options){
       return new Component(initializers);
-    }
-  }
+    };
+  };
 
 })(Backbone, Marionette, $, _);
