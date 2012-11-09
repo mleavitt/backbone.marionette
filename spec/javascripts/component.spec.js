@@ -25,6 +25,53 @@ describe("component", function(){
     });
   });
 
+  describe("when passing options through the constructor", function(){
+    var MyComponent, initializer, options;
+
+    beforeEach(function(){
+      initializer = jasmine.createSpy("initializer");
+      options = {foo: "bar"};
+
+      MyComponent = Marionette.Component(function(comp){
+        comp.addInitializer(initializer);
+      });
+
+      var myComp = new MyComponent(options);
+      myComp.start();
+    });
+
+    it("should pass options through initializers", function(){
+      var opts = initializer.mostRecentCall.args[0];
+      expect(opts.foo).toBe("bar");
+    });
+  });
+
+  describe("when passing options through the constructor and start method", function(){
+    var MyComponent, initializer;
+
+    beforeEach(function(){
+      initializer = jasmine.createSpy("initializer");
+
+      MyComponent = Marionette.Component(function(comp){
+        comp.addInitializer(initializer);
+      });
+
+      var myComp = new MyComponent({foo: "bar", x: "1"});
+      myComp.start({baz: "quux", x: "override"});
+    });
+
+    it("should merge the options", function(){
+      var opts = initializer.mostRecentCall.args[0];
+      expect(opts.foo).toBe("bar");
+      expect(opts.baz).toBe("quux");
+    });
+    
+    it("should override constructor options with start method options", function(){
+      var opts = initializer.mostRecentCall.args[0];
+      expect(opts.x).toBe("override");
+    });
+  });
+
   describe("when starting a component that is already started", function(){
 
     var MyComponent, initializer;

@@ -41,13 +41,16 @@ Marionette.Component = (function(Backbone, Marionette, $, _){
   // Component
   // ---------
 
-  var Component = function(initializers){
+  var Component = function(initializers, options){
     this.initializers = initializers;
+    this.options = options;
   };
 
   _.extend(Component.prototype, {
     start: function(options){
       if (this._started){ return; }
+
+      options = _.extend({}, this.options, options);
 
       this._started = true;
       this.initializers.runInitializers(options, this);
